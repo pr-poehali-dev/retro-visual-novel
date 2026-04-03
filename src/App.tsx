@@ -6,6 +6,9 @@ import Gallery from './pages/game/Gallery';
 import WorldMap from './pages/game/WorldMap';
 import SaveLoad from './pages/game/SaveLoad';
 import Icon from '@/components/ui/icon';
+import { useSound } from '@/hooks/useSound';
+
+type IconName = 'Home' | 'MessageSquare' | 'Package' | 'Image' | 'Map' | 'Save';
 
 export type Screen = 'menu' | 'dialog' | 'inventory' | 'gallery' | 'map' | 'saveload';
 
@@ -64,7 +67,7 @@ const INITIAL_STATE: GameState = {
   ],
 };
 
-const NAV_ITEMS: { id: Screen; label: string; icon: string }[] = [
+const NAV_ITEMS: { id: Screen; label: string; icon: IconName }[] = [
   { id: 'menu', label: 'Меню', icon: 'Home' },
   { id: 'dialog', label: 'Диалог', icon: 'MessageSquare' },
   { id: 'inventory', label: 'Вещи', icon: 'Package' },
@@ -77,15 +80,23 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('menu');
   const [gameState] = useState<GameState>(INITIAL_STATE);
   const [gameStarted, setGameStarted] = useState(false);
+  const { play } = useSound();
 
   const handleStartGame = () => {
+    play('menuSelect');
     setGameStarted(true);
     setScreen('dialog');
   };
 
   const handleContinue = () => {
+    play('loadGame');
     setGameStarted(true);
     setScreen('dialog');
+  };
+
+  const handleNav = (id: Screen) => {
+    play('menuMove');
+    setScreen(id);
   };
 
   return (
@@ -123,7 +134,7 @@ export default function App() {
             {NAV_ITEMS.map(item => (
               <button
                 key={item.id}
-                onClick={() => setScreen(item.id)}
+                onClick={() => handleNav(item.id)}
                 className="px-2 py-1 transition-all"
                 style={{
                   color: screen === item.id ? 'var(--retro-amber)' : 'rgba(255,230,200,0.4)',
@@ -132,7 +143,7 @@ export default function App() {
                 }}
                 title={item.label}
               >
-                <Icon name={item.icon as any} size={14} />
+                <Icon name={item.icon} size={14} />
               </button>
             ))}
           </div>

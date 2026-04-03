@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GameState, InventoryItem } from '@/App';
 import Icon from '@/components/ui/icon';
+import { useSound } from '@/hooks/useSound';
 
 interface Props {
   gameState: GameState;
@@ -25,6 +26,9 @@ const EMPTY_SLOTS = 6;
 export default function Inventory({ gameState, onBack }: Props) {
   const [selected, setSelected] = useState<InventoryItem | null>(null);
   const [filter, setFilter] = useState<'all' | 'common' | 'rare' | 'legendary'>('all');
+  const { play } = useSound();
+
+  useEffect(() => { play('inventoryOpen'); }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = gameState.inventory.filter(
     item => filter === 'all' || item.rarity === filter
@@ -88,7 +92,7 @@ export default function Inventory({ gameState, onBack }: Props) {
               <div
                 key={item.id}
                 className={`inv-slot ${selected?.id === item.id ? 'selected' : ''}`}
-                onClick={() => setSelected(selected?.id === item.id ? null : item)}
+                onClick={() => { play('itemPickup'); setSelected(selected?.id === item.id ? null : item); }}
                 title={item.name}
               >
                 <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>{item.emoji}</span>

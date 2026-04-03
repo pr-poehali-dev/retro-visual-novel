@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { GameState, SaveData } from '@/App';
 import Icon from '@/components/ui/icon';
+import { useSound } from '@/hooks/useSound';
 
 interface Props {
   gameState: GameState;
@@ -13,6 +14,7 @@ export default function SaveLoad({ gameState, onBack, onLoad }: Props) {
   const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
   const [savedMsg, setSavedMsg] = useState<number | null>(null);
   const [saves, setSaves] = useState<SaveData[]>(gameState.saves);
+  const { play } = useSound();
 
   const handleSave = (slot: number) => {
     const newSave: SaveData = {
@@ -26,6 +28,7 @@ export default function SaveLoad({ gameState, onBack, onLoad }: Props) {
     };
     setSaves(prev => prev.map(s => s.slot === slot ? newSave : s));
     setSavedMsg(slot);
+    play('saveGame');
     setTimeout(() => setSavedMsg(null), 2000);
   };
 
@@ -183,7 +186,7 @@ export default function SaveLoad({ gameState, onBack, onLoad }: Props) {
                     {tab === 'load' && !isEmpty && (
                       <button
                         className="retro-btn retro-btn-sm retro-btn-teal"
-                        onClick={() => onLoad(save)}
+                        onClick={() => { play('loadGame'); onLoad(save); }}
                       >
                         ЗАГРУЗИТЬ
                       </button>
